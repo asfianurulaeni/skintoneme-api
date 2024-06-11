@@ -203,4 +203,58 @@ const readUser = async (request, h) => {
     }
 }
 
-module.exports = {register, login, readUser};
+const updateUser = async (request, h) => {
+    const { 
+        username,
+        gender,
+        email,
+        password
+    } = request.payload;
+
+    const token = request.headers.authorization.replace('Bearer ', '');
+    let decodedToken;
+
+    try{
+        decodedToken = jwt.verify(token, 'secret_key');
+    } catch (err) {
+        const response = h.response({
+            status: 'missed',
+            message: 'User is not authorized!',
+        });
+        response.code(401);
+        return response;
+    }
+
+    const userId = decodedToken.userId;
+
+    try {
+        const query = 'UPDATE users SET username = ?, gender = ?, email = ?, password = ? WHERE id = ?';
+        
+        // will add userId later
+        await new Promise((resolve, reject) => {
+            pool.query(query, [username, gender, email, password, userId], (err, rows, field) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            });
+        });
+
+        const response = h.response({
+            status: 'success',
+            message: 'update successful',
+        });
+        response.code(200);
+        return response;
+    } catch (err) {
+        const response = h.response({
+            status: 'fail',
+            message: err.message,
+        });
+        response.code(500);
+        return response;
+    }
+}
+
+module.exports = {register, login, readUser, updateUser};
