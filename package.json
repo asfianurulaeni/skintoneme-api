@@ -1,0 +1,19 @@
+{
+  "name": "skintoneme-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./src/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@hapi/hapi": "^21.3.9",
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "promise-mysql": "^5.2.0"
+  }
+}
