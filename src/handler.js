@@ -145,8 +145,6 @@ const login = async (request, h) => {
     }
 }
 
-javascript
-Copy code
 const readUser = async (request, h) => {
     try {
         const authHeader = request.headers.authorization;
