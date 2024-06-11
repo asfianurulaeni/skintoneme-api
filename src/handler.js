@@ -162,7 +162,7 @@ const readUser = async (request, h) => {
 
         const userId = decodedToken.userId;
 
-        const query = 'SELECT * FROM users WHERE user_id = ?';
+        const query = 'SELECT * FROM users WHERE id = ?';
         
         const user = await new Promise((resolve, reject) => {
             pool.query(query, [userId], (err, rows, field) => {
