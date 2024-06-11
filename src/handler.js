@@ -173,7 +173,7 @@ const readUser = async (request, h) => {
 
         const userId = decodedToken.userId;
 
-        const query = 'SELECT id AS user_id, username AS user_name, email AS user_email, age AS user_age, gender AS user_gender, height AS user_height, weight AS user_weight FROM users WHERE id = ?';
+        const query = 'SELECT * FROM users WHERE id = ?';
 
         const user = await new Promise((resolve, reject) => {
             pool.query(query, [userId], (err, rows, field) => {
