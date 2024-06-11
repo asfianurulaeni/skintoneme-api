@@ -123,7 +123,7 @@ const login = async (request, h) => {
             return response;
         }
         
-        const token = jwt.sign({ userId : user.user_id }, 'secret_key');
+        const token = jwt.sign({ userId : user.id }, 'secret_key');
     
         const response = h.response({
             status: 'success',
