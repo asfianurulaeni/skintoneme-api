@@ -21,6 +21,7 @@ const register = async (request, h) => {
     try {
         const {
             name,
+            gender,
             email,
             pass
         } = request.payload;
@@ -57,10 +58,10 @@ const register = async (request, h) => {
     
         const hashedPass = await bcrypt.hash(pass, 10);
     
-        const query = "INSERT INTO users(username, email, password) VALUES(?, ?, ?)";
+        const query = "INSERT INTO users(username, gender, email, password) VALUES(?, ?, ?, ?)";
     
         await new Promise((resolve, reject) => {
-            pool.query(query, [name, email, hashedPass], (err, rows, field) => {
+            pool.query(query, [name, gender, email, hashedPass], (err, rows, field) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -110,7 +111,7 @@ const login = async (request, h) => {
             return response;
         }
         
-        const isPassValid = await bcrypt.compare(pass, user.user_pass);
+        const isPassValid = await bcrypt.compare(pass, user.password);
         
         if (!isPassValid){
             const response = h.response({
