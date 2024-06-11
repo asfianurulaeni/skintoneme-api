@@ -144,4 +144,62 @@ const login = async (request, h) => {
     }
 }
 
-module.exports = {register, login};
+const readUser = async (request, h) => {
+    try {
+        const token = request.headers.authorization.replace('Bearer ', '');
+        let decodedToken;
+
+        try{
+            decodedToken = jwt.verify(token, 'secret_key');
+        } catch (err) {
+            const response = h.response({
+                status: 'missed',
+                message: 'User is not authorized!',
+            });
+            response.code(401);
+            return response;
+        }
+
+        const userId = decodedToken.userId;
+
+        const query = 'SELECT * FROM users WHERE user_id = ?';
+        
+        const user = await new Promise((resolve, reject) => {
+            pool.query(query, [userId], (err, rows, field) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows[0]);
+                }
+            });
+        });
+
+        if (!user){
+            const response = h.response({
+                status: 'fail',
+                message: 'User is not found!',
+            });
+            response.code(400);
+            return response;
+        }
+
+        const { password, ...userData } = user;
+
+        const response = h.response({
+            status: 'success',
+            message: 'read successful',
+            data: userData,
+        });
+        response.code(200);
+        return response;
+    } catch (err) {
+        const response = h.response({
+            status: 'fail',
+            message: err.message,
+        });
+        response.code(500);
+        return response;
+    }
+}
+
+module.exports = {register, login, readUser};

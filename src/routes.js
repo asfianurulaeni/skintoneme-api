@@ -1,4 +1,4 @@
-const {register, login} = require('./handler');
+const {register, login, readUser} = require('./handler');
 
 const routes = [
     {
@@ -6,10 +6,17 @@ const routes = [
         path: '/register',
         handler: register,
     },
+
     {
         method: 'POST',
         path: '/login',
         handler: login,
+    },
+
+    {
+        method: 'GET',
+        path: '/readUser',
+        handler: readUser,
     },
 ];
 
