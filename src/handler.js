@@ -38,7 +38,7 @@ const register = async (request, h) => {
         // cek email di db
         const checkEmailQuery = 'SELECT * FROM users WHERE email = ?';
         const existingUser = await new Promise((resolve, reject) => {
-            connection.query(checkEmailQuery, [email], (err, rows, field) => {
+            pool.query(checkEmailQuery, [email], (err, rows, field) => {
                 if (err) {
                     reject(err);
                 } else {
