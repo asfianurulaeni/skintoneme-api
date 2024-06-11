@@ -194,12 +194,10 @@ const readUser = async (request, h) => {
             return response;
         }
 
-        const { password, ...userData } = user;
-
         const response = h.response({
             status: 'success',
             message: 'read successful',
-            data: userData,
+            data: user,
         });
         response.code(200);
         return response;
