@@ -20,13 +20,13 @@ const createUnixSocketPool = async config => {
 const register = async (request, h) => {
     try {
         const {
-            name,
+            username,
             gender,
             email,
-            pass
+            password
         } = request.payload;
     
-        if (!email || !pass) {
+        if (!email || !password) {
             const response = h.response({
                 status: 'fail',
                 message: 'Please fill email and password',
@@ -56,12 +56,12 @@ const register = async (request, h) => {
             return response;
         }
     
-        const hashedPass = await bcrypt.hash(pass, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
     
         const query = "INSERT INTO users(username, gender, email, password) VALUES(?, ?, ?, ?)";
     
         await new Promise((resolve, reject) => {
-            pool.query(query, [name, gender, email, hashedPass], (err, rows, field) => {
+            pool.query(query, [username, gender, email, hashedPassword], (err, rows, field) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -87,7 +87,7 @@ const register = async (request, h) => {
 }
 
 const login = async (request, h) => {
-    const { email, pass } = request.payload;
+    const { email, password } = request.payload;
 
     try {
         const query = "SELECT * FROM users WHERE email = ?";
@@ -111,7 +111,7 @@ const login = async (request, h) => {
             return response;
         }
         
-        const isPassValid = await bcrypt.compare(pass, user.password);
+        const isPassValid = await bcrypt.compare(password, user.password);
         
         if (!isPassValid){
             const response = h.response({
