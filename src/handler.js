@@ -127,7 +127,10 @@ const login = async (request, h) => {
         const response = h.response({
             status: 'success',
             message: 'login successful',
-            data: { token },
+            username: user.username,
+            data: { 
+                token
+            },
         });
         response.code(200);
         return response;
