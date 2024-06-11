@@ -147,24 +147,14 @@ const login = async (request, h) => {
 
 const readUser = async (request, h) => {
     try {
-        const authHeader = request.headers.authorization;
-        if (!authHeader) {
-            const response = h.response({
-                status: 'fail',
-                message: 'Authorization header is missing!',
-            });
-            response.code(401);
-            return response;
-        }
-
-        const token = authHeader.replace('Bearer ', '');
+        const token = request.headers.authorization.replace('Bearer ', '');
         let decodedToken;
 
-        try {
+        try{
             decodedToken = jwt.verify(token, 'secret_key');
         } catch (err) {
             const response = h.response({
-                status: 'fail',
+                status: 'missed',
                 message: 'User is not authorized!',
             });
             response.code(401);
@@ -174,7 +164,7 @@ const readUser = async (request, h) => {
         const userId = decodedToken.userId;
 
         const query = 'SELECT * FROM users WHERE id = ?';
-
+        
         const user = await new Promise((resolve, reject) => {
             pool.query(query, [userId], (err, rows, field) => {
                 if (err) {
@@ -185,19 +175,21 @@ const readUser = async (request, h) => {
             });
         });
 
-        if (!user) {
+        if (!user){
             const response = h.response({
                 status: 'fail',
                 message: 'User is not found!',
             });
-            response.code(404);
+            response.code(400);
             return response;
         }
+
+        const { password, ...userData } = user;
 
         const response = h.response({
             status: 'success',
             message: 'read successful',
-            data: user,
+            data: userData,
         });
         response.code(200);
         return response;
@@ -209,6 +201,6 @@ const readUser = async (request, h) => {
         response.code(500);
         return response;
     }
-};
+}
 
 module.exports = {register, login, readUser};
