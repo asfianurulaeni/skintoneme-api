@@ -260,9 +260,10 @@ const updateUser = async (request, h) => {
 const deleteUser = async (request, h) => {
     try {
         const token = request.headers.authorization.replace('Bearer ', '');
+        const { password } = request.payload;
         let decodedToken;
 
-        try{
+        try {
             decodedToken = jwt.verify(token, 'secret_key');
         } catch (err) {
             const response = h.response({
@@ -275,32 +276,59 @@ const deleteUser = async (request, h) => {
 
         const userId = decodedToken.userId;
 
-         // Delete user
-         const query = 'DELETE FROM users WHERE id = ?';
-         await new Promise((resolve, reject) => {
-             pool.query(query, [userId], (err, rows, field) => {
-                 if (err) {
-                     reject(err);
-                 } else {
-                     resolve();
-                 }
-             });
-         });
-         const response = h.response({
-             status: 'success',
-             message: 'Delete successful',
-         });
-         response.code(200);
-         return response;
-     } catch (err) {
-         const response = h.response({
-             status: 'fail',
-             message: err.message,
-         });
-         response.code(500);
-         return response;
-     }
- };
+        // Get user from database
+        const getUserQuery = 'SELECT password FROM users WHERE id = ?';
+        const user = await new Promise((resolve, reject) => {
+            pool.query(getUserQuery, [userId], (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else if (rows.length === 0) {
+                    reject(new Error('User not found'));
+                } else {
+                    resolve(rows[0]);
+                }
+            });
+        });
+
+        // Validate password
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            const response = h.response({
+                status: 'fail',
+                message: 'Invalid password',
+            });
+            response.code(401);
+            return response;
+        }
+
+        // Delete user
+        const deleteUserQuery = 'DELETE FROM users WHERE id = ?';
+        await new Promise((resolve, reject) => {
+            pool.query(deleteUserQuery, [userId], (err, rows, field) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            });
+        });
+
+        const response = h.response({
+            status: 'success',
+            message: 'Delete successful',
+        });
+        response.code(200);
+        return response;
+
+    } catch (err) {
+        const response = h.response({
+            status: 'fail',
+            message: err.message,
+        });
+        response.code(500);
+        return response;
+    }
+};
  
 
 module.exports = {register, login, readUser, updateUser, deleteUser};
