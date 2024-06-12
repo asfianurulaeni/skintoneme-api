@@ -257,4 +257,50 @@ const updateUser = async (request, h) => {
     }
 }
 
-module.exports = {register, login, readUser, updateUser};
+const deleteUser = async (request, h) => {
+    try {
+        const token = request.headers.authorization.replace('Bearer ', '');
+        let decodedToken;
+
+        try{
+            decodedToken = jwt.verify(token, 'secret_key');
+        } catch (err) {
+            const response = h.response({
+                status: 'missed',
+                message: 'User is not authorized!',
+            });
+            response.code(401);
+            return response;
+        }
+
+        const userId = decodedToken.userId;
+
+         // Delete user
+         const query = 'DELETE FROM users WHERE id = ?';
+         await new Promise((resolve, reject) => {
+             pool.query(query, [userId], (err, rows, field) => {
+                 if (err) {
+                     reject(err);
+                 } else {
+                     resolve();
+                 }
+             });
+         });
+         const response = h.response({
+             status: 'success',
+             message: 'Delete successful',
+         });
+         response.code(200);
+         return response;
+     } catch (err) {
+         const response = h.response({
+             status: 'fail',
+             message: err.message,
+         });
+         response.code(500);
+         return response;
+     }
+ };
+ 
+
+module.exports = {register, login, readUser, updateUser, deleteUser};
