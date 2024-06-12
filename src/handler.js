@@ -129,6 +129,8 @@ const login = async (request, h) => {
             status: 'success',
             message: 'login successful',
             username: user.username,
+            email: user.email,
+            gender: user.gender,
             data: { 
                 token
             },
