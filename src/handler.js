@@ -230,11 +230,12 @@ const updateUser = async (request, h) => {
     const userId = decodedToken.userId;
 
     try {
+        const hashedPassword = await bcrypt.hash(password, 10);
         const query = 'UPDATE users SET username = ?, gender = ?, email = ?, password = ? WHERE id = ?';
         
         // will add userId later
         await new Promise((resolve, reject) => {
-            pool.query(query, [username, gender, email, password, userId], (err, rows, field) => {
+            pool.query(query, [username, gender, email, hashedPassword, userId], (err, rows, field) => {
                 if (err) {
                     reject(err);
                 } else {
